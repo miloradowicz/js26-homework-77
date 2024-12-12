@@ -9,7 +9,7 @@ function App() {
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       maxSnack={1}
     >
-      <Container sx={{ p: 2 }}>
+      <Container sx={{ p: 4 }}>
         <Feed />
       </Container>
     </SnackbarProvider>

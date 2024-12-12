@@ -60,11 +60,11 @@ const FeedbackForm = () => {
 
     setData((data) => ({ ...data, message: '', author: '' }));
 
-    await dispatch(loadFeedbacks);
+    await dispatch(loadFeedbacks());
   };
 
   return (
-    <Box p={4}>
+    <Box p={6}>
       <Typography variant='h5' mb={2}>
         Tell us your thoughts. We reaaally wanna hear it.
       </Typography>

@@ -14,7 +14,7 @@ const FeedbackItem: FC<Props> = ({ author, message, image }) => {
     <Card variant='outlined' sx={{ display: 'flex' }}>
       {image && (
         <CardMedia
-          sx={{ maxHeight: '100%', minWidth: 300 }}
+          sx={{ minHeight: 150, maxHeight: '100%', minWidth: 250 }}
           image={new URL(image, new URL('images/', baseURL)).href}
         />
       )}
