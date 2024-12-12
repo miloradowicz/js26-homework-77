@@ -8,7 +8,7 @@
   "nodemonConfig": {
     "ignore": [
       "db.json",
-      "images/*"
+      "public/*"
     ]
   },
   "keywords": [],

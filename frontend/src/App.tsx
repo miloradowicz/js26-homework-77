@@ -1,11 +1,18 @@
 import { Container } from '@mui/material';
-import Feedback from './containers/Feedback/Feedback';
+import Feed from './containers/Feed/Feed';
+import { SnackbarProvider } from 'notistack';
 
 function App() {
   return (
-    <Container sx={{ p: 2 }}>
-      <Feedback />
-    </Container>
+    <SnackbarProvider
+      autoHideDuration={3000}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      maxSnack={1}
+    >
+      <Container sx={{ p: 2 }}>
+        <Feed />
+      </Container>
+    </SnackbarProvider>
   );
 }
 
