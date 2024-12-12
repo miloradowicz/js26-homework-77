@@ -1,9 +1,12 @@
-import { Box, Stack, TextField } from '@mui/material';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
 
 import FileInput from '../UI/FileInput/FileInput';
-import { ChangeEventHandler, FC, FormEventHandler, useState } from 'react';
+import { ChangeEventHandler, FormEventHandler, useState } from 'react';
 import { LoadingButton } from '@mui/lab';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { selectSending } from '@/store/slices/feedbackSlice';
+import { loadFeedbacks, sendFeedback } from '@/store/thunks/feedbackThunk';
 
 interface Data {
   author: string;
@@ -11,22 +14,18 @@ interface Data {
   image: File | null;
 }
 
-interface Props {
-  onSubmit: (
-    message: string,
-    author: string | null,
-    image: File | null
-  ) => void;
-}
+const FeedbackForm = () => {
+  const dispatch = useAppDispatch();
 
-const FeedbackForm: FC<Props> = ({ onSubmit }) => {
+  const sending = useAppSelector(selectSending);
+
   const [data, setData] = useState<Data>({
     author: '',
     message: '',
     image: null,
   });
+
   const [error, setError] = useState<string>();
-  const [loading, setLoading] = useState(false);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.name === 'message') {
@@ -42,29 +41,33 @@ const FeedbackForm: FC<Props> = ({ onSubmit }) => {
     }
   };
 
-  const handleSubmit: FormEventHandler = (e) => {
-    try {
-      setLoading(true);
-      e.preventDefault();
+  const handleSubmit: FormEventHandler = async (e) => {
+    e.preventDefault();
 
-      if (!data.message) {
-        setError('Message must be filled out.');
+    if (!data.message) {
+      setError('Message must be filled out.');
 
-        return;
-      }
-
-      onSubmit(
-        data.message,
-        data.author ? data.author : null,
-        data.image ? data.image : null
-      );
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    await dispatch(
+      sendFeedback({
+        author: data.author ? data.author : null,
+        message: data.message,
+        image: data.image ? data.image : null,
+      })
+    );
+
+    setData((data) => ({ ...data, message: '', author: '' }));
+
+    await dispatch(loadFeedbacks);
   };
 
   return (
-    <Box p={2}>
+    <Box p={4}>
+      <Typography variant='h5' mb={2}>
+        Tell us your thoughts. We reaaally wanna hear it.
+      </Typography>
       <form onSubmit={handleSubmit}>
         <Stack gap={2}>
           <TextField
@@ -92,7 +95,7 @@ const FeedbackForm: FC<Props> = ({ onSubmit }) => {
             buttonProps={{ startIcon: <CloudUpload /> }}
             onChange={handleFileInputChange}
           />
-          <LoadingButton type='submit' loading={loading}>
+          <LoadingButton type='submit' loading={sending}>
             Send
           </LoadingButton>
         </Stack>

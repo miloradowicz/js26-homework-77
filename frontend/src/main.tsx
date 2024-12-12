@@ -5,10 +5,14 @@ import App from './App.tsx';
 import { CssBaseline } from '@mui/material';
 
 import '@fontsource/roboto/cyrillic.css';
+import { Provider } from 'react-redux';
+import { store } from './app/store.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CssBaseline />
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>
 );

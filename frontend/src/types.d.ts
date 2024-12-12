@@ -4,3 +4,7 @@ export interface Feedback {
   message: string;
   image: string | null;
 }
+
+export type FeedbackMutation = Omit<Feedback, 'id' | 'image'> & {
+  image: File | null;
+};

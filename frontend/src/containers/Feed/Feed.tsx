@@ -1,81 +1,35 @@
-import { api } from '@/api';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import FeedbackForm from '@/components/FeedbackForm/FeedbackForm';
 import FeedbackList from '@/components/FeedbackList/FeedbackList';
-import { Feedback } from '@/types';
+import {
+  selectFeedbacks,
+  selectLastError,
+  selectLoading,
+} from '@/store/slices/feedbackSlice';
+import { loadFeedbacks } from '@/store/thunks/feedbackThunk';
 import { LinearProgress } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const Feed = () => {
   const ref = useRef<HTMLDivElement>(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const dispatch = useAppDispatch();
 
-  const { enqueueSnackbar } = useSnackbar();
-
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadFeedback = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const { data, status, statusText } = await api.get<Feedback[]>(
-        'feedback'
-      );
-
-      if (status !== 200) {
-        throw new Error(statusText);
-      }
-
-      setFeedbacks([...data]);
-    } catch (e) {
-      if (e instanceof Error) {
-        enqueueSnackbar(e.message, { variant: 'error' });
-      } else {
-        console.error(e);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [enqueueSnackbar]);
-
-  const sendFeedback = useCallback(
-    async (message: string, author: string | null, image: File | null) => {
-      try {
-        const body = new FormData();
-        body.append('message', message);
-
-        if (author) {
-          body.append('author', author);
-        }
-
-        if (image) {
-          body.append('image', image);
-        }
-
-        const { status, statusText } = await api.post<Feedback>(
-          'feedback',
-          body
-        );
-
-        if (status !== 200) {
-          throw new Error(statusText);
-        }
-
-        await loadFeedback();
-      } catch (e) {
-        if (e instanceof Error) {
-          enqueueSnackbar(e.message, { variant: 'error' });
-        } else {
-          console.error(e);
-        }
-      }
-    },
-    [enqueueSnackbar, loadFeedback]
-  );
+  const feedbacks = useAppSelector(selectFeedbacks);
+  const loading = useAppSelector(selectLoading);
+  const lastError = useAppSelector(selectLastError);
 
   useEffect(() => {
-    loadFeedback();
-  }, [loadFeedback]);
+    dispatch(loadFeedbacks());
+  }, [dispatch]);
+
+  useEffect(() => {
+    closeSnackbar();
+    if (lastError) {
+      enqueueSnackbar(lastError.message, { variant: 'error' });
+    }
+  }, [lastError, enqueueSnackbar, closeSnackbar]);
 
   useEffect(() => {
     ref.current?.scrollIntoView();
@@ -85,7 +39,7 @@ const Feed = () => {
     <>
       <FeedbackList feedbacks={feedbacks} />
       {loading && <LinearProgress />}
-      <FeedbackForm onSubmit={sendFeedback} />
+      <FeedbackForm />
       <div ref={ref} />
     </>
   );
