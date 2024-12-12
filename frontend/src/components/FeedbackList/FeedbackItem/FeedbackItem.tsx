@@ -9,7 +9,7 @@ interface Props {
 
 const FeedbackItem: FC<Props> = ({ author, message, image }) => {
   return (
-    <Card>
+    <Card variant='outlined'>
       {image && <CardMedia sx={{ height: 140, width: 200 }} image={image} />}
       <CardContent>
         <Typography gutterBottom variant='h5' component='div'>

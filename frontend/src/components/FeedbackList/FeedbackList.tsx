@@ -1,11 +1,24 @@
 import { Stack } from '@mui/material';
 
 import FeedbackItem from './FeedbackItem/FeedbackItem';
+import { Feedback } from '@/types';
+import { FC } from 'react';
 
-const FeedbackList = () => {
+interface Props {
+  feedbacks: Feedback[];
+}
+
+const FeedbackList: FC<Props> = ({ feedbacks }) => {
   return (
-    <Stack>
-      <FeedbackItem />
+    <Stack gap={1}>
+      {feedbacks.map((x) => (
+        <FeedbackItem
+          key={x.id}
+          author={x.author}
+          message={x.message}
+          image={x.image}
+        />
+      ))}
     </Stack>
   );
 };
