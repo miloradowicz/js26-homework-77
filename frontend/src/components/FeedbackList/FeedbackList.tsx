@@ -14,6 +14,7 @@ const FeedbackList: FC<Props> = ({ feedbacks }) => {
       {feedbacks.map((x) => (
         <FeedbackItem
           key={x.id}
+          id={x.id}
           author={x.author}
           message={x.message}
           image={x.image}

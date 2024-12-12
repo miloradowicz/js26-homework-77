@@ -2,6 +2,7 @@ import { api } from '@/api';
 import FeedbackForm from '@/components/FeedbackForm/FeedbackForm';
 import FeedbackList from '@/components/FeedbackList/FeedbackList';
 import { Feedback } from '@/types';
+import { LinearProgress } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -11,9 +12,12 @@ const Feed = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const loadFeedback = useCallback(async () => {
     try {
+      setLoading(true);
+
       const { data, status, statusText } = await api.get<Feedback[]>(
         'feedback'
       );
@@ -23,13 +27,14 @@ const Feed = () => {
       }
 
       setFeedbacks([...data]);
-      ref.current?.scrollIntoView();
     } catch (e) {
       if (e instanceof Error) {
         enqueueSnackbar(e.message, { variant: 'error' });
       } else {
         console.error(e);
       }
+    } finally {
+      setLoading(false);
     }
   }, [enqueueSnackbar]);
 
@@ -72,9 +77,14 @@ const Feed = () => {
     loadFeedback();
   }, [loadFeedback]);
 
+  useEffect(() => {
+    ref.current?.scrollIntoView();
+  }, [feedbacks]);
+
   return (
     <>
       <FeedbackList feedbacks={feedbacks} />
+      {loading && <LinearProgress />}
       <FeedbackForm onSubmit={sendFeedback} />
       <div ref={ref} />
     </>
